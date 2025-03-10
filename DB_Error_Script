@@ -1,0 +1,8 @@
+Private Sub Worksheet_Change(ByVal Target As Range)
+    ' Run script only if changes are made in A to J columns
+    If Not Intersect(Target, Me.Range("A:J")) Is Nothing Then
+        Application.EnableEvents = False ' Prevent infinite loop
+        ProcessErrors ' Call the main error processing macro
+        Application.EnableEvents = True
+    End If
+End Sub
