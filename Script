@@ -1,0 +1,142 @@
+Sub ProcessErrors()
+    Dim wsDB As Worksheet, wsSOP As Worksheet
+    Dim lastRowDB As Long, lastRowSOP As Long, i As Long, j As Long
+    Dim errorText As String, vendorText As String, status As String, resolution As String
+    Dim sopDict As Object
+    Dim descText As String
+    Dim regexError As Object, regexVendor As Object, regexNumbers As Object
+    Dim matches As Object
+
+    ' Set worksheet references
+    Set wsDB = ThisWorkbook.Sheets("DB_Errors")
+    Set wsSOP = ThisWorkbook.Sheets("SOP_Errors")
+
+    ' Find last row in DB_Errors and SOP_Errors
+    lastRowDB = wsDB.Cells(wsDB.Rows.Count, 1).End(xlUp).Row
+    lastRowSOP = wsSOP.Cells(wsSOP.Rows.Count, 1).End(xlUp).Row
+
+    ' Create dictionary for SOP errors
+    Set sopDict = CreateObject("Scripting.Dictionary")
+
+    ' Load SOP errors and resolutions into dictionary
+    For j = 2 To lastRowSOP
+        If Not IsEmpty(wsSOP.Cells(j, 1).Value) Then
+            sopDict(wsSOP.Cells(j, 1).Value) = wsSOP.Cells(j, 2).Value
+        End If
+    Next j
+
+    ' Insert headers if not already present
+    wsDB.Cells(1, 11).Value = "Description"       ' Column K
+    wsDB.Cells(1, 12).Value = "Error Type"        ' Column L
+    wsDB.Cells(1, 13).Value = "Vendor"            ' Column M
+    wsDB.Cells(1, 14).Value = "Status"            ' Column N
+    wsDB.Cells(1, 15).Value = "Resolution Comments" ' Column O
+
+    ' Format headers
+    wsDB.Range("K1:O1").Font.Bold = True
+    wsDB.Range("K1:O1").Interior.Color = RGB(255, 255, 0) ' Yellow background
+
+    ' Create Regex for extracting "Error# ..." onwards
+    Set regexError = CreateObject("VBScript.RegExp")
+    regexError.Pattern = "(Error#.*)"
+    regexError.IgnoreCase = True
+    regexError.Global = False
+
+    ' Create Regex for checking if Error Type contains numbers
+    Set regexNumbers = CreateObject("VBScript.RegExp")
+    regexNumbers.Pattern = "\d" ' Checks for any number in the text
+    regexNumbers.IgnoreCase = True
+    regexNumbers.Global = False
+
+    ' Create Regex for extracting "Vendor# ..." onwards
+    Set regexVendor = CreateObject("VBScript.RegExp")
+    regexVendor.Pattern = "(Vendor#.*)"
+    regexVendor.IgnoreCase = True
+    regexVendor.Global = False
+
+    ' Loop through DB_Errors to process data
+    For i = 2 To lastRowDB
+        ' Copy data from A to J with a new line after each column
+        descText = ""
+        For j = 1 To 10
+            If Not IsEmpty(wsDB.Cells(i, j).Value) Then
+                descText = descText & wsDB.Cells(i, j).Value & vbNewLine
+            End If
+        Next j
+
+        ' Store Description and apply wrap text
+        wsDB.Cells(i, 11).Value = descText
+        wsDB.Cells(i, 11).WrapText = True
+        wsDB.Rows(i).AutoFit ' Auto-adjust row height for better visibility
+        wsDB.Cells(i, 11).Interior.Color = RGB(230, 220, 255) ' Faded Violet
+
+        ' Extract "Error# ..." onwards from Description using Regex
+        errorText = ""
+        If regexError.Test(descText) Then
+            Set matches = regexError.Execute(descText)
+            If matches.Count > 0 Then
+                errorText = matches(0).SubMatches(0)
+                ' Check if the error contains a number
+                If regexNumbers.Test(errorText) Then
+                    errorText = "" ' Blank out Error Type if it contains numbers
+                End If
+            End If
+        End If
+        wsDB.Cells(i, 12).Value = errorText ' Column L (Error Type)
+
+        ' Extract "Vendor# ..." onwards from Description using Regex
+        vendorText = ""
+        If regexVendor.Test(descText) Then
+            Set matches = regexVendor.Execute(descText)
+            If matches.Count > 0 Then
+                vendorText = matches(0).SubMatches(0)
+            End If
+        End If
+        wsDB.Cells(i, 13).Value = vendorText ' Column M (Vendor)
+
+        ' Match against SOP errors even if Error Type is blank
+        resolution = ""
+        status = ""
+        
+        For Each Key In sopDict.Keys
+            If InStr(descText, Key) > 0 Then
+                resolution = sopDict(Key)
+                status = "Matched"
+                Exit For
+            End If
+        Next Key
+
+        ' If no match is found, mark as unmatched
+        If resolution = "" Then
+            status = "Unmatched"
+        End If
+
+        ' Populate Status and Resolution Comments columns
+        wsDB.Cells(i, 14).Value = status  ' Column N
+        wsDB.Cells(i, 15).Value = resolution ' Column O
+
+        ' Apply conditional formatting
+        If status = "Matched" Then
+            wsDB.Cells(i, 14).Interior.Color = RGB(144, 238, 144) ' Light Green
+        ElseIf status = "Unmatched" Then
+            wsDB.Cells(i, 14).Interior.Color = RGB(255, 182, 193) ' Light Red
+        End If
+    Next i
+
+    ' Adjust column width dynamically
+    wsDB.Columns("K").ColumnWidth = 50 ' Set optimal width for description
+    wsDB.Columns("K").WrapText = True ' Ensure text wraps properly
+    wsDB.Rows.AutoFit ' Adjust all row heights to fit text properly
+
+    ' Autofit remaining columns
+    wsDB.Columns("L:O").AutoFit
+
+    ' Cleanup
+    Set sopDict = Nothing
+    Set regexError = Nothing
+    Set regexVendor = Nothing
+    Set regexNumbers = Nothing
+
+    MsgBox "Error processing completed!", vbInformation, "Process Complete"
+End Sub
+
