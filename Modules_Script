@@ -6,6 +6,7 @@ Sub ProcessErrors()
     Dim descText As String
     Dim regexError As Object, regexVendor As Object, regexNumbers As Object
     Dim matches As Object
+    Dim rng As Range
 
     ' Set worksheet references
     Set wsDB = ThisWorkbook.Sheets("DB_Errors")
@@ -68,7 +69,7 @@ Sub ProcessErrors()
         wsDB.Cells(i, 11).Value = descText
         wsDB.Cells(i, 11).WrapText = True
         wsDB.Rows(i).AutoFit ' Auto-adjust row height for better visibility
-        wsDB.Cells(i, 11).Interior.Color = RGB(230, 220, 255) ' Faded Violet
+        wsDB.Cells(i, 11).Interior.Color = RGB(255, 255, 255) ' Change to White (Default)
 
         ' Extract "Error# ..." onwards from Description using Regex
         errorText = ""
@@ -131,6 +132,24 @@ Sub ProcessErrors()
     ' Autofit remaining columns
     wsDB.Columns("L:O").AutoFit
 
+    ' Apply borders **ONLY to K (Description) and N (Status) columns**
+    Dim borderColumns As Variant
+    borderColumns = Array("K", "N") ' Columns where borders should be applied
+    
+    Dim col As Variant
+    For Each col In borderColumns
+        Set rng = wsDB.Range(col & "1:" & col & lastRowDB)
+        With rng.Borders
+            .LineStyle = xlContinuous
+            .Weight = xlThin
+            .ColorIndex = xlAutomatic
+        End With
+    Next col
+
+    ' Apply middle alignment to L (Error Type) and M (Vendor)
+    wsDB.Range("L2:M" & lastRowDB).HorizontalAlignment = xlCenter
+    wsDB.Range("L2:M" & lastRowDB).VerticalAlignment = xlCenter
+
     ' Cleanup
     Set sopDict = Nothing
     Set regexError = Nothing
@@ -139,4 +158,3 @@ Sub ProcessErrors()
 
     MsgBox "Error processing completed!", vbInformation, "Process Complete"
 End Sub
-
