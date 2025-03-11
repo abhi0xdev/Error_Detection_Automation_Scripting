@@ -146,9 +146,13 @@ Sub ProcessErrors()
         End With
     Next col
 
-    ' Apply middle alignment to L (Error Type) and M (Vendor)
-    wsDB.Range("L2:M" & lastRowDB).HorizontalAlignment = xlCenter
-    wsDB.Range("L2:M" & lastRowDB).VerticalAlignment = xlCenter
+    ' Apply middle alignment to L, M, N, and O
+    wsDB.Range("L2:O" & lastRowDB).HorizontalAlignment = xlCenter
+    wsDB.Range("L2:O" & lastRowDB).VerticalAlignment = xlCenter
+
+    ' Apply wrap text to column O (Resolution Comments)
+    wsDB.Columns("O").WrapText = True
+    wsDB.Rows.AutoFit ' Ensure row heights adjust for wrapped text
 
     ' Cleanup
     Set sopDict = Nothing
@@ -158,3 +162,4 @@ Sub ProcessErrors()
 
     MsgBox "Error processing completed!", vbInformation, "Process Complete"
 End Sub
+
