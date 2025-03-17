@@ -7,6 +7,10 @@ Sub ProcessErrors()
     Dim regexError As Object, regexVendor As Object, regexNumbers As Object
     Dim matches As Object
     Dim rng As Range
+    Dim dict As Object
+    
+    Set dict = CreateObject("Scripting.Dictionary")
+
 
     ' Set worksheet references
     Set wsDB = ThisWorkbook.Sheets("DB_Errors")
@@ -146,19 +150,24 @@ Sub ProcessErrors()
         End With
     Next col
 
-    ' Apply middle alignment to L, M, N, and O
-    wsDB.Range("L2:O" & lastRowDB).HorizontalAlignment = xlCenter
-    wsDB.Range("L2:O" & lastRowDB).VerticalAlignment = xlCenter
-
-    ' Apply wrap text to column O (Resolution Comments)
-    wsDB.Columns("O").WrapText = True
-    wsDB.Rows.AutoFit ' Ensure row heights adjust for wrapped text
+    ' Apply middle alignment to L (Error Type) and M (Vendor)
+    wsDB.Range("L2:M" & lastRowDB).HorizontalAlignment = xlCenter
+    wsDB.Range("L2:M" & lastRowDB).VerticalAlignment = xlCenter
 
     ' Cleanup
     Set sopDict = Nothing
     Set regexError = Nothing
     Set regexVendor = Nothing
     Set regexNumbers = Nothing
+    
+    ' Freeze the first row
+    wsDB.Activate
+    wsDB.Rows("2:2").Select
+    ActiveWindow.FreezePanes = True
+
+    ' Ensure column M has wrapped text
+    wsDB.Columns("M").WrapText = True
+
 
     MsgBox "Error processing completed!", vbInformation, "Process Complete"
 End Sub
