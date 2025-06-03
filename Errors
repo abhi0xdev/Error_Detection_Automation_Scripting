@@ -1,0 +1,30 @@
+#Errors
+ERROR# A trading partner with translator code 191636844, location_code 0011486921 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID
+ERROR# A trading partner with translator code 2014707827, location_code A4B0QXC00 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+ERROR# A trading partner with translator code 2014707827, location_code FP3240140(Orlando) for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+ERROR# A trading partner with translator code REGENERONGE, location_code 7609143 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID
+ERROR# A trading partner with translator code EEC9196786611, location_code FP3240140(Orlando) for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID
+ERROR# A trading partner with translator code 177667227, location_code 649845 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID
+ERROR# A trading partner with translator code 006906614D, location_code 063037553 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID
+ERROR# INVALID PO LINE NUM
+ERROR# INVALID INV TYPE LOOKUP
+ERROR# NO INVOICE LINES
+ERROR# INVALID PRICE/QUANTITY/AMOUNT
+ERROR# INVALID SHIPMENT TYPE
+Error# A trading partner with translator code 191636844, location_code 2150122170 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code AIMMUNEGE, location_code BF8715661 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code SUPERNUSPS, location_code BF8715661BI9716587 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code PE0048579, location_code  for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code PROSTRAKANSPS, location_code  for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code TARSUSSPS, location_code 15443 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code BF8715661, location_code  for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# Unable to derive a unique bill from address for the EDI Location Code 15443 with the ORG_ID
+Error# A trading partner with translator code BI9716587, location_code  for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code FO1120500, location_code  for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# Multiple Trading Partner Entries were found for the translator code 4152258529 , location code BI9716587 for the transaction type INI. Ensure that the combination of translator code and location code is unique. Control record 0010 has the ORG_ID .
+Error# Unable to derive a unique bill from address for the EDI Location Code 0093385 with the ORG_ID
+Error# Unable to derive a unique bill from address for the EDI Location Code 8175489 with the ORG_ID
+Error# Unable to derive a unique bill from address for the EDI Location Code 8001675 with the ORG_ID
+Error# Unable to derive a unique bill from address for the EDI Location Code 9042549 with the ORG_ID
+Error# A trading partner with translator code 177667227, location_code 207532 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID .
+Error# A trading partner with translator code 177667227, location_code 207534 for the INI transaction is not defined.  Set up the trading partner in the Gateway. Control Record 0010 has the ORG_ID 
