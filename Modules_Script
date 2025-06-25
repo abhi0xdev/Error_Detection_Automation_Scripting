@@ -4,13 +4,12 @@ Sub ProcessErrors()
     Dim errorText As String, vendorText As String, status As String, resolution As String
     Dim sopDict As Object
     Dim descText As String
-    Dim regexError As Object, regexVendor As Object, regexNumbers As Object
+    Dim regexError As Object, regexVendor As Object, regexNumbers As Object, regexInvoice As Object
     Dim matches As Object
     Dim rng As Range
     Dim dict As Object
     
     Set dict = CreateObject("Scripting.Dictionary")
-
 
     ' Set worksheet references
     Set wsDB = ThisWorkbook.Sheets("DB_Errors")
@@ -33,13 +32,14 @@ Sub ProcessErrors()
     ' Insert headers if not already present
     wsDB.Cells(1, 11).Value = "Description"       ' Column K
     wsDB.Cells(1, 12).Value = "Error Type"        ' Column L
-    wsDB.Cells(1, 13).Value = "Vendor"            ' Column M
-    wsDB.Cells(1, 14).Value = "Status"            ' Column N
-    wsDB.Cells(1, 15).Value = "Resolution Comments" ' Column O
+    wsDB.Cells(1, 13).Value = "Vendor Name"            ' Column M
+    wsDB.Cells(1, 14).Value = "Invoice Number"           ' Column N
+    wsDB.Cells(1, 15).Value = "Status"            ' Column O
+    wsDB.Cells(1, 16).Value = "Resolution Comments" ' Column P
 
     ' Format headers
-    wsDB.Range("K1:O1").Font.Bold = True
-    wsDB.Range("K1:O1").Interior.Color = RGB(255, 255, 0) ' Yellow background
+    wsDB.Range("K1:P1").Font.Bold = True
+    wsDB.Range("K1:P1").Interior.Color = RGB(255, 255, 0) ' Yellow background
 
     ' Create Regex for extracting "Error# ..." onwards
     Set regexError = CreateObject("VBScript.RegExp")
@@ -49,15 +49,21 @@ Sub ProcessErrors()
 
     ' Create Regex for checking if Error Type contains numbers
     Set regexNumbers = CreateObject("VBScript.RegExp")
-    regexNumbers.Pattern = "\d" ' Checks for any number in the text
+    regexNumbers.Pattern = "\d"
     regexNumbers.IgnoreCase = True
     regexNumbers.Global = False
 
-    ' Create Regex for extracting "Vendor# ..." onwards
+    ' Create Regex for extracting "Vendor# ..." onwards (only the name)
     Set regexVendor = CreateObject("VBScript.RegExp")
-    regexVendor.Pattern = "(Vendor#.*)"
+    regexVendor.Pattern = "(Vendor#\s*(\w+\s*\w*))"
     regexVendor.IgnoreCase = True
     regexVendor.Global = False
+
+    ' Create Regex for extracting "Invoice# <Number>"
+    Set regexInvoice = CreateObject("VBScript.RegExp")
+    regexInvoice.Pattern = "(Invoice#\s*\d+)"
+    regexInvoice.IgnoreCase = True
+    regexInvoice.Global = False
 
     ' Loop through DB_Errors to process data
     For i = 2 To lastRowDB
@@ -89,27 +95,38 @@ Sub ProcessErrors()
         End If
         wsDB.Cells(i, 12).Value = errorText ' Column L (Error Type)
 
-        ' Extract "Vendor# ..." onwards from Description using Regex
+        ' Extract "Vendor# ..." onwards from Description using Regex (only name)
         vendorText = ""
         If regexVendor.Test(descText) Then
             Set matches = regexVendor.Execute(descText)
             If matches.Count > 0 Then
-                vendorText = matches(0).SubMatches(0)
+                vendorText = matches(0).SubMatches(1) ' Extract the name part
             End If
         End If
         wsDB.Cells(i, 13).Value = vendorText ' Column M (Vendor)
+
+        ' Extract "Invoice# <Number>" from Description using Regex
+        Dim invoiceText As String
+        invoiceText = ""
+        If regexInvoice.Test(descText) Then
+            Set matches = regexInvoice.Execute(descText)
+            If matches.Count > 0 Then
+                invoiceText = matches(0).SubMatches(0)
+            End If
+        End If
+        wsDB.Cells(i, 14).Value = invoiceText ' Column N (Invoice)
 
         ' Match against SOP errors even if Error Type is blank
         resolution = ""
         status = ""
         
-        For Each Key In sopDict.Keys
-            If InStr(descText, Key) > 0 Then
-                resolution = sopDict(Key)
+        For Each key In sopDict.Keys
+            If InStr(descText, key) > 0 Then
+                resolution = sopDict(key)
                 status = "Matched"
                 Exit For
             End If
-        Next Key
+        Next key
 
         ' If no match is found, mark as unmatched
         If resolution = "" Then
@@ -117,28 +134,30 @@ Sub ProcessErrors()
         End If
 
         ' Populate Status and Resolution Comments columns
-        wsDB.Cells(i, 14).Value = status  ' Column N
-        wsDB.Cells(i, 15).Value = resolution ' Column O
+        wsDB.Cells(i, 15).Value = status  ' Column O (Status)
+        wsDB.Cells(i, 16).Value = resolution ' Column P (Resolution Comments)
 
         ' Apply conditional formatting
         If status = "Matched" Then
-            wsDB.Cells(i, 14).Interior.Color = RGB(144, 238, 144) ' Light Green
+            wsDB.Cells(i, 15).Interior.Color = RGB(144, 238, 144) ' Light Green
         ElseIf status = "Unmatched" Then
-            wsDB.Cells(i, 14).Interior.Color = RGB(255, 182, 193) ' Light Red
+            wsDB.Cells(i, 15).Interior.Color = RGB(255, 182, 193) ' Light Red
         End If
     Next i
 
     ' Adjust column width dynamically
     wsDB.Columns("K").ColumnWidth = 50 ' Set optimal width for description
     wsDB.Columns("K").WrapText = True ' Ensure text wraps properly
+    wsDB.Columns("M").ColumnWidth = 20 ' Set minimum width for Vendor
+    wsDB.Columns("N").ColumnWidth = 25 ' Set minimum width for Invoice
     wsDB.Rows.AutoFit ' Adjust all row heights to fit text properly
 
     ' Autofit remaining columns
-    wsDB.Columns("L:O").AutoFit
+    wsDB.Columns("L:P").AutoFit
 
-    ' Apply borders **ONLY to K (Description) and N (Status) columns**
+    ' Apply borders **ONLY to K (Description) and O (Status) columns**
     Dim borderColumns As Variant
-    borderColumns = Array("K", "N") ' Columns where borders should be applied
+    borderColumns = Array("K", "O") ' Columns where borders should be applied
     
     Dim col As Variant
     For Each col In borderColumns
@@ -150,24 +169,21 @@ Sub ProcessErrors()
         End With
     Next col
 
-    ' Apply middle alignment to L (Error Type) and M (Vendor)
-    wsDB.Range("L2:M" & lastRowDB).HorizontalAlignment = xlCenter
-    wsDB.Range("L2:M" & lastRowDB).VerticalAlignment = xlCenter
+    ' Apply top alignment to L (Error Type), M (Vendor), and N (Invoice)
+    wsDB.Range("L2:N" & lastRowDB).HorizontalAlignment = xlLeft
+    wsDB.Range("L2:N" & lastRowDB).VerticalAlignment = xlTop
 
     ' Cleanup
     Set sopDict = Nothing
     Set regexError = Nothing
     Set regexVendor = Nothing
     Set regexNumbers = Nothing
+    Set regexInvoice = Nothing
     
     ' Freeze the first row
     wsDB.Activate
     wsDB.Rows("2:2").Select
     ActiveWindow.FreezePanes = True
-
-    ' Ensure column M has wrapped text
-    wsDB.Columns("M").WrapText = True
-
 
     MsgBox "Error processing completed!", vbInformation, "Process Complete"
 End Sub
