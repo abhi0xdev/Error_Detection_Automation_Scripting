@@ -1,1 +1,137 @@
+Great, Hamid! You've built an impressive and production-ready 810 rejection automation tool using VBA. Here's a STAR method response you can confidently present to your manager or team leadership in a structured, storytelling format.
+
+
+---
+
+🟨 STAR Method – 810 Rejection Automation Using VBA
+
+✅ Situation
+
+As part of our EDI operations, we were manually reviewing and analyzing 810 invoice rejection logs in Excel. Each row contained complex, multiline data, and team members had to:
+
+Manually extract error descriptions,
+
+Identify vendors, invoices, and error types,
+
+Cross-reference SOP rules,
+
+And finally categorize each issue as “matched” or “unmatched” for resolution.
+
+
+This was not only time-consuming (30–60 minutes daily) but also prone to human errors and inconsistencies in resolution tagging.
+
+
+---
+
+✅ Task
+
+I took the initiative to automate the end-to-end rejection categorization process using VBA scripting in Excel.
+The goal was to:
+
+Extract structured information from unstructured text,
+
+Match it against SOP rules,
+
+Populate status and resolution, and
+
+Highlight matched/unmatched entries with formatting and reporting — all with a single click or sheet update.
+
+
+
+---
+
+✅ Action
+
+I developed a two-part VBA automation system:
+
+1. Trigger Setup
+
+Created a Worksheet_Change event in the SOP_ERRORS sheet to automatically trigger the process when the data was updated in columns A to J.
+
+
+2. Core Logic in ProcessErrors Macro
+
+Loaded both DB Errors and SOP Errors into memory.
+
+Used Regular Expressions (RegEx) to:
+
+Extract Error Type from lines containing Error#
+
+Pull Vendor names from Vendor# lines
+
+Capture Invoice# for identification
+
+
+Implemented a dictionary-based lookup from the SOP sheet to classify each issue.
+
+Automatically populated the following fields in each row:
+
+📌 Description (compiled view of 10 columns)
+
+📌 Error Type
+
+📌 Vendor Name
+
+📌 Invoice Number
+
+📌 Match Status
+
+📌 Resolution Comments (from SOP)
+
+
+Applied:
+
+Color-based conditional formatting for quick visual feedback (Green = matched, Red = unmatched),
+
+Column width adjustments, wrapping, and borders for neatness.
+
+
+Final touch: added freeze panes and a message box confirmation at the end for user-friendliness.
+
+
+
+---
+
+✅ Result
+
+🔄 Time savings: Manual effort reduced from 45–60 minutes to under 5 minutes per batch.
+
+🧠 Error-prone steps eliminated: Human interpretation of SOPs replaced by rule-based automation.
+
+📊 Standardized outputs: Rejection logs are now consistent, organized, and presentation-ready.
+
+👍 Adopted by team: Used across EDI team for multiple trading partners and invoice batches.
+
+📈 Scalable: Easy to extend with more error types, partners, or SOP rules.
+
+
+
+---
+
+🎯 BONUS SLIDE / TALKING POINTS
+
+Next Steps:
+
+Convert to Python or Power Automate for cross-platform use
+
+Store logs in centralized database (SQL/SharePoint)
+
+Automate email dispatch of matched/unmatched reports
+
+
+
+
+---
+
+💡 Use This as a Resume Bullet:
+
+> ✅ Automated EDI 810 invoice rejection classification using advanced VBA scripting with RegEx, dictionary-based SOP mapping, and dynamic formatting — reducing manual effort by 90% and improving rejection report standardization.
+
+
+
+
+---
+
+Let me know if you’d like a presentation slide format, flowchart diagram, or spoken script to go with this explanation — happy to prep that too!
+
 
